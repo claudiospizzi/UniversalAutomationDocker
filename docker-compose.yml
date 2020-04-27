@@ -10,6 +10,9 @@ services:
     env_file: app/.env
     volumes:
       - app_database:/app/database
+    ports:
+      - "8080:8080"
+      - "10000:10000"
 
 volumes:
-  app_database
+  app_database:
