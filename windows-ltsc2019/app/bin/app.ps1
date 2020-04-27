@@ -1,0 +1,15 @@
+Import-Module 'UniversalAutomation'
+Import-Module 'UniversalAutomation.Dashboard'
+
+$uaServerSplat = @{
+    Port                = 10000
+    ConnectionString    = 'C:\App\Database/database.db'
+    RepositoryPath      = 'C:\App\Repository'
+    GitRemote           = $Env:UA_GIT_REMOTE
+    GitRemoteCredential = [System.Management.Automation.PSCredential]::new($Env:UA_GIT_REMOTE_USERNAME, (ConvertTo-SecureString -String $Env:UA_GIT_REMOTE_PASSWORD -AsPlainText -Force))
+    JwtSigningKey       = $Env:UA_JWT_SIGNING_KEY
+}
+$appToken = Start-UAServer @uaServerSplat
+
+Connect-UAServer -ComputerName 'http://localhost:10000' -AppToken $appToken
+Start-UADashboard -ComputerName "http://localhost:10000" -Port 8080

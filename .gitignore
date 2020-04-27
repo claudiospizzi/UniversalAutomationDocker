@@ -1,2 +1,2 @@
 # Ignore the real environment, just commit an example.
-app/.env
+**/.env
