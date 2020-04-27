@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+
+  # Universal Automation
+  app:
+    restart: always
+    build:
+      context: app/
+    env_file: app/.env
+    volumes:
+      - app_database:/app/database
+
+volumes:
+  app_database
