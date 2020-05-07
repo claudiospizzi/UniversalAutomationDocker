@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 
 services:
 
@@ -9,7 +9,7 @@ services:
       context: app/
     env_file: app/.env
     volumes:
-      - app_database:C:\App\Database
+      - app_database:C:/App/Database
     ports:
       - "8080:8080"
       - "10000:10000"
