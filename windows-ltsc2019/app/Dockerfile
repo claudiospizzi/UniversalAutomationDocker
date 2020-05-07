@@ -1,20 +1,26 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+# Docker Image for Universal Automation
 
-ARG ua_version=1.3.1
+# Use the WS2019 PowerShell image, with this we have Windows PowerShell 5.1 and
+# the latest PowerShell 7.0 available.
+FROM mcr.microsoft.com/powershell:lts-windowsservercore-1809
 
-# Prepare the profile: handle errors and suppress progress bar
-RUN powershell -Command "New-Item -Path 'C:\\Users\\ContainerAdministrator\\Documents\\WindowsPowerShell' -ItemType 'Directory' | Out-Null"
-RUN powershell -Command "Add-Content -Path 'C:\\Users\\ContainerAdministrator\\Documents\\WindowsPowerShell\\profile.ps1' -Value '\$ProgressPreference = ''SilentlyContinue'''"
-RUN powershell -Command "Add-Content -Path 'C:\\Users\\ContainerAdministrator\\Documents\\WindowsPowerShell\\profile.ps1' -Value '\$ErrorActionPreference = ''Stop'''"
+# Copy setup files to the conatiner. The Setup folder contains all scripts to
+# prepare the image for Universal Automation.
+COPY [ "Setup", "C:/Setup/" ]
 
-# Install the Universal Automation modules
-RUN powershell -Command "Install-Module -Name 'UniversalAutomation' -RequiredVersion '${ua_version}' -Force"
-RUN powershell -Command "Install-Module -Name 'UniversalAutomation.Dashboard' -RequiredVersion '${ua_version}' -Force"
+# Install git.
+RUN powershell -Command "C:\Setup\InstallGit.ps1" "2.26.1"
 
-COPY bin/app.ps1 C:\App\run.ps1
+# Install PowerShell modules.
+RUN powershell -Command "C:\Setup\InstallModule.ps1" "1.3.1"
 
+# Define docker ports, for ua dashbaord and automation.
 EXPOSE 8080 10000
 
-VOLUME [ "C:\\App\\Database" ]
+VOLUME [ "C:/App/Database/" ]
 
-ENTRYPOINT [ "powershell", "-File", "C:\\App\\run.ps1" ]
+# Finally, copy the app scripts
+COPY [ "App", "C:/App/" ]
+
+# And run the app
+ENTRYPOINT [ "powershell", "-File", "C:\\App\\App.ps1" ]
